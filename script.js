@@ -354,7 +354,7 @@ function toggleTheme() {
         return; // 禁用开关，不再执行切换主题的逻辑
     } else if (clickCount == 5) {
         alert("不要玩開關");
-    } else if (clickCount > 5) {
+    } else if (clickCount > 10) {
         return; // 禁用开关，不再执行切换主题的逻辑
     }
     
