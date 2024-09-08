@@ -5,6 +5,13 @@ let draggedItemOriginalPosition = null;
 let isCleared = true;  // 用來追蹤目前是清空狀態還是填寫狀態
 
 window.onload = function () {
+    document.addEventListener("touchstart", function(event) {
+      if (event.touches.length > 1) {
+        event.preventDefault(); // 阻止双指触屏事件
+        // 在此处添加您的自定义操作，例如显示提示信息或执行其他逻辑
+      }
+    }, { passive: false });
+    
     document.getElementById('result-modal').style.display = 'none';
     const grid = document.querySelector('.adventure-grid');
     for (let i = 1; i <= 20; i++) {
