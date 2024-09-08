@@ -1,6 +1,7 @@
 let adventures = [];
 let draggedItem = null;
 let isCleared = true;  // 用來追蹤目前是清空狀態還是填寫狀態
+let isDragging = false;  // 新增變數，用來追蹤是否有項目在拖曳中
 
 window.onload = function () {
     document.getElementById('result-modal').style.display = 'none';
@@ -145,12 +146,22 @@ function dragEnd() {
     updateIndices();  // 更新序號
 }
 
+
+
+// 觸控開始
 function touchStart(e) {
+    // 檢查是否已經有項目在拖曳
+    if (isDragging) {
+        return;  // 如果有其他項目在拖曳，則禁止開始新的拖曳
+    }
+
     e.preventDefault();
     draggedItem = this;
+    isDragging = true;  // 標記為拖曳中
     setTimeout(() => this.classList.add('dragging'), 0);
 }
 
+// 觸控移動
 function touchMove(e) {
     e.preventDefault();
     const touch = e.touches[0];
@@ -162,10 +173,12 @@ function touchMove(e) {
     }
 }
 
+// 觸控結束
 function touchEnd() {
     if (draggedItem) {
         draggedItem.classList.remove('dragging');
         draggedItem = null;
+        isDragging = false;  // 結束拖曳後，重置為未拖曳狀態
         updateIndices();  // 更新序號
     }
 }
