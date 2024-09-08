@@ -177,11 +177,11 @@ function dragOver(e) {
 
 
 function touchStart(e) {
-    if (event.touches.length > 1) {
-        event.preventDefault(); // 阻止双指触屏事件
+    if (e.touches.length > 1) {
+        e.preventDefault(); // 阻止双指触屏事件
         // 在此处添加您的自定义操作，例如显示提示信息或执行其他逻辑
         return;
-    };
+    }
     e.preventDefault();
     draggedItem = this;
     setTimeout(() => this.classList.add('dragging'), 0);
@@ -189,6 +189,11 @@ function touchStart(e) {
 
 function touchMove(e) {
     e.preventDefault();
+    if (e.touches.length > 1) {
+        e.preventDefault(); // 阻止双指触屏事件
+        // 在此处添加您的自定义操作，例如显示提示信息或执行其他逻辑
+        return;
+    }
     const touch = e.touches[0];
     const afterElement = getDragAfterElement(this, touch.clientY);
     if (afterElement == null) {
@@ -199,6 +204,11 @@ function touchMove(e) {
 }
 
 function touchEnd() {
+    if (e.touches.length > 1) {
+        e.preventDefault(); // 阻止双指触屏事件
+        // 在此处添加您的自定义操作，例如显示提示信息或执行其他逻辑
+        return;
+    }
     if (draggedItem) {
         draggedItem.classList.remove('dragging');
         draggedItem = null;
