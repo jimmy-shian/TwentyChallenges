@@ -1,8 +1,8 @@
 let adventures = [];
 let draggedItem = null;
+let draggedItemOriginalPosition = null;
+
 let isCleared = true;  // 用來追蹤目前是清空狀態還是填寫狀態
-let isDragging = false;
-let selectedCount = 0;  // 用來追蹤被點選的項目數量
 
 window.onload = function () {
     document.getElementById('result-modal').style.display = 'none';
@@ -39,6 +39,7 @@ window.onload = function () {
     // 切換 `isCleared` 的狀態
     isCleared = !isCleared;
 }
+
 // 點擊事件處理器，處理隱藏 modal 的邏輯
 document.addEventListener('click', function(event) {
     const modal = document.getElementById('result-modal');
@@ -47,40 +48,8 @@ document.addEventListener('click', function(event) {
     if (event.target == modal) {
         modal.style.display = "none";
     }
-
-    // 監聽 adventure-item 是否被點擊
-    if (target.classList.contains('list-item')) {
-        // 檢查是否已經點選了該項目
-        if (target.classList.contains('selected')) {
-            target.classList.remove('selected');
-            selectedCount--;  // 取消選中則減少計數
-        } else {
-            target.classList.add('selected');
-            selectedCount++;  // 選中則增加計數
-        }
-
-        // 根據點選的項目數來禁用或啟用拖曳
-        if (selectedCount >= 2) {
-            disableDrag();  // 當有兩個或更多項目被選中時禁用拖曳
-        } else {
-            enableDrag();  // 當少於兩個項目被選中時啟用拖曳
-        }
-    }
 });
 
-function disableDrag() {
-    const listItems = document.querySelectorAll('.list-item');
-    listItems.forEach(item => {
-        item.setAttribute('draggable', false);  // 禁用拖曳
-    });
-}
-
-function enableDrag() {
-    const listItems = document.querySelectorAll('.list-item');
-    listItems.forEach(item => {
-        item.setAttribute('draggable', true);  // 啟用拖曳
-    });
-}
 
 function clearAll() {
     const button = document.querySelector('.button-group button');
@@ -168,30 +137,51 @@ function addDragListeners() {
     });
 }
 
+// ... (previous code remains unchanged)
+
 function dragStart() {
     draggedItem = this;
     setTimeout(() => this.classList.add('dragging'), 0);
+    
+    // 取得該項目屬於的列表
+    const parentList = this.closest('.list').id;
+    this.setAttribute('data-origin-list', parentList);  // 設定屬性標明來自哪個列表
+        // 保存原始位置
+    const listItems = Array.from(this.parentNode.children);
+    draggedItemOriginalPosition = listItems.indexOf(this);
 }
 
 function dragEnd() {
     this.classList.remove('dragging');
     draggedItem = null;
+    draggedItemOriginalPosition = null;
     updateIndices();  // 更新序號
 }
 
-// 觸控開始
-function touchStart(e) {
-    if (isDragging || selectedCount >= 2) {
-        return;  // 禁止開始新的拖曳
+function dragOver(e) {
+    e.preventDefault();
+    const afterElement = getDragAfterElement(this, e.clientY);
+    const draggedList = draggedItem.getAttribute('data-origin-list');
+    const currentList = this.id;
+
+    // 檢查是否為同一個列表
+    if (draggedList === currentList) {
+        if (afterElement == null) {
+            this.appendChild(draggedItem);
+        } else {
+            this.insertBefore(draggedItem, afterElement);
+        }
     }
-    
+}
+
+
+
+function touchStart(e) {
     e.preventDefault();
     draggedItem = this;
-    isDragging = true;  // 標記為拖曳中
     setTimeout(() => this.classList.add('dragging'), 0);
 }
 
-// 觸控移動
 function touchMove(e) {
     e.preventDefault();
     const touch = e.touches[0];
@@ -203,26 +193,23 @@ function touchMove(e) {
     }
 }
 
-// 觸控結束
 function touchEnd() {
     if (draggedItem) {
         draggedItem.classList.remove('dragging');
         draggedItem = null;
-        isDragging = false;  // 結束拖曳後，重置為未拖曳狀態
         updateIndices();  // 更新序號
     }
 }
 
-
-function dragOver(e) {
-    e.preventDefault();
-    const afterElement = getDragAfterElement(this, e.clientY);
-    if (afterElement == null) {
-        this.appendChild(draggedItem);
-    } else {
-        this.insertBefore(draggedItem, afterElement);
-    }
-}
+//function dragOver(e) {
+//    e.preventDefault();
+//    const afterElement = getDragAfterElement(this, e.clientY);
+//    if (afterElement == null) {
+//        this.appendChild(draggedItem);
+//    } else {
+//        this.insertBefore(draggedItem, afterElement);
+//    }
+//}
 
 function dragEnter(e) {
     e.preventDefault();
@@ -230,8 +217,35 @@ function dragEnter(e) {
 
 function dragLeave() {}
 
-function drop() {}
+function drop(e) {
+    e.preventDefault();
+    const dropTarget = this;  // 目前放置的列表
+    const draggedList = draggedItem.getAttribute('data-origin-list');  // 拖曳項目的列表類型
+    const dropTargetList = dropTarget.id;  // 目標列表的 ID
+    
+    // 檢查是否同一個列表內
+    if (draggedList === dropTargetList) {
+        const afterElement = getDragAfterElement(dropTarget, e.clientY);
+        if (afterElement == null) {
+            dropTarget.appendChild(draggedItem);
+        } else {
+            dropTarget.insertBefore(draggedItem, afterElement);
+        }
+    } else {
+        console.log('禁止跨列表拖曳！');
+        // 将元素放回原始位置
+        const originalList = document.getElementById(draggedList);
+        const listItems = Array.from(originalList.children);
+        if (draggedItemOriginalPosition >= listItems.length) {
+            originalList.appendChild(draggedItem);
+        } else {
+            originalList.insertBefore(draggedItem, listItems[draggedItemOriginalPosition]);
+        }
+    }
+    updateIndices();  // 更新序號
+}
 
+// ... (rest of the code remains unchanged)
 function getDragAfterElement(container, y) {
     const draggableElements = [...container.querySelectorAll('.list-item:not(.dragging)')];
 
