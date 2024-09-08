@@ -1,0 +1,174 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    color: #333;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    margin-top: 3%;
+}
+
+#input-container {
+    margin-bottom: 20px;
+    padding-bottom: 20px; /* 添加一些 padding 來防止按鈕緊貼容器底部 */
+}
+
+h2, h3 {
+    color: #89B166;
+}
+
+.adventure-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3%;
+}
+
+.adventure-input {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #9CC578;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s;
+}
+.adventure-input:hover {
+    background-color: #dfdbff;
+}
+
+#lists-container {
+    display: flex;
+    justify-content: space-between;
+}
+
+.list {
+    width: 45%;
+    border: 1px solid #ccc;
+    padding: 10px;
+    min-height: 400px;
+    background-color: #FFF3F5;
+    border-radius: 8px;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.1);
+    position: relative;
+}
+
+.list::before {
+    content: attr(data-description);
+    position: absolute;
+    top: -25px;
+    left: 0;
+    width: 100%;
+    text-align: center;
+    font-weight: bold;
+    color: #D084AF;
+}
+
+.list-item {
+    background-color: #D5B58B;
+    margin: 5px 0;
+    padding: 10px 40px 10px 10px;
+    cursor: move;
+    border-radius: 4px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    user-select: none;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.list-item:hover {
+    background-color: #D4A38A;
+}
+
+.list-item .index {
+    width: 30px;
+    text-align: center;
+    font-weight: bold;
+    margin-right: 10px;
+    background-color: #96BF72;
+    border-radius: 4px;
+}
+
+.list-item .item-content {
+    flex-grow: 1;
+}
+
+.list-item.dragging {
+    opacity: 0.5;
+}
+
+#result-modal {
+    display: none;
+    position: fixed;
+    z-index: 1000;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content {
+    background-color: white;
+    margin: 15% auto;
+    padding: 20px;
+    border-radius: 5px;
+    width: 50%;
+    text-align: center;
+    box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+.button-group {
+    margin-top: 50px; /* 添加頂部間距來避免按鈕緊貼冒險事項列表 */
+    text-align: center;
+}
+
+.button-group button {
+    margin: 0 10px;
+    padding: 10px 20px;
+    border: none;
+    background-color: #9CC578;
+    color: white;
+    font-size: 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.button-group button:hover {
+    background-color: #8FB86B;
+}
+
+@media only screen and (max-width: 768px) { /* 如果屏幕宽度小于等于768px */
+    .adventure-grid {
+        max-height: 900px;
+        justify-items: center;
+        grid-template-columns: repeat(2, 50%);
+        gap: 3%;
+    }
+
+    .adventure-input {
+        width: 90%;
+        height: 35%;
+        padding: 1px;
+        margin-top: 3%;
+    }
+
+    #input-container {
+        margin-bottom: 20px;
+        min-height: 700px;
+    }
+
+    .button-group {
+        display: flex;
+        margin: 0 auto;
+        justify-items: center;
+    } 
+    .button-group button {
+        margin: 0 10px;
+        padding: 10px 20px;
+    }
+}
