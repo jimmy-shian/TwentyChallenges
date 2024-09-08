@@ -1,6 +1,10 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background-color: #f4f6f9;
+    background-color: rgba(244, 246, 249, 0.8); /* 使用带透明度的背景色叠加 */
+    background-image: url('img/background.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-blend-mode: overlay; /* 叠加颜色到背景图片 */
     color: #333;
     max-width: 900px;
     margin: 0 auto;
@@ -42,6 +46,7 @@ h2, h3 {
 }
 
 .list {
+    margin: 6px;
     width: 45%;
     border: 1px solid #ccc;
     padding: 10px;
@@ -142,6 +147,83 @@ h2, h3 {
     background-color: #8FB86B;
 }
 
+/* 亮色與暗色模式的基本樣式 */
+/* 亮色模式 */
+body.light-mode {
+    background-color: #F0F4F8;
+    color: #495057;
+}
+
+.adventure-input.light-mode {
+    background-color: #ffffff;
+    border-color: #4B7BE5;
+}
+
+.button-group button.light-mode {
+    background-color: #4B7BE5;
+}
+
+.list.light-mode {
+    background-color: #ffffff;
+    border-color: #4B7BE5;
+}
+
+
+/* 暗色模式 */
+body.dark-mode {
+    background-color: #2D2F36;
+    color: #D1D5DB;
+}
+
+.adventure-input.dark-mode {
+    background-color: #3C4047;
+    border-color: #6875F5;
+    color: aliceblue;
+}
+.adventure-input.dark-mode:hover {
+    background-color: #8293af;
+    border-color: #6875F5;
+    color: aliceblue;
+}
+
+.button-group button.dark-mode {
+    background-color: #6875F5;
+}
+
+.list.dark-mode {
+    background-color: #3C4047;
+    border-color: #6875F5;
+}
+
+.list-item.dark-mode .index {
+    background-color: #314122;
+}
+.list-item.dark-mode {
+    background-color: #88612e;
+}
+.list-item.dark-mode:hover {
+    background-color: #a58a66;
+}
+/* 電燈開關的樣式 */
+#theme-switch {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    background-color: #f1c40f;
+    border: none;
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+#theme-switch.dark-mode {
+    background-color: #f39c12;
+}
+
+
+
 @media only screen and (max-width: 768px) { /* 如果屏幕宽度小于等于768px */
     .adventure-grid {
         max-height: 900px;
@@ -165,10 +247,19 @@ h2, h3 {
     .button-group {
         display: flex;
         margin-top: 20px;
+        margin-left: 10%;
         justify-items: center;
     } 
     .button-group button {
         margin: 0 10px;
         padding: 10px 20px;
+        margin-top: 3%;
+    }
+    
+    #theme-switch {
+        bottom: 15px;
+        left: 15px;
+        padding: 3px;
+        font-size: 14px;
     }
 }

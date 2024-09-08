@@ -38,6 +38,18 @@ window.onload = function () {
     }
     // 切換 `isCleared` 的狀態
     isCleared = !isCleared;
+    
+        // 应用保存的主题
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark') {
+        document.body.classList.add('dark-mode');
+        const elements = document.querySelectorAll('.list, .adventure-input, .button-group button, .list-item, .modal-content');
+        elements.forEach((el) => {
+            el.classList.add('dark-mode');
+        });
+        document.getElementById('theme-switch').textContent = '☀️';
+        darkorlight = false;
+    }
 }
 
 // 點擊事件處理器，處理隱藏 modal 的邏輯
@@ -109,8 +121,18 @@ function showLists() {
     desireList.innerHTML = '<h3>不想做到想做</h3>';
 
     adventures.forEach((adventure, index) => {
-        difficultyList.innerHTML += `<div class="list-item" draggable="true" data-index="${index + 1}" id="diff-${index}"><div class="index">${index + 1}. </div><div class="item-content">${adventure}</div></div>`;
-        desireList.innerHTML += `<div class="list-item" draggable="true" data-index="${index + 1}" id="desire-${index}"><div class="index">${index + 1}. </div><div class="item-content">${adventure}</div></div>`;
+        const difficultyItem = `<div class="list-item ${darkorlight ? '' : 'dark-mode'}" draggable="true" data-index="${index + 1}" id="diff-${index}">
+            <div class="index">${index + 1}. </div>
+            <div class="item-content">${adventure}</div>
+        </div>`;
+        
+        const desireItem = `<div class="list-item ${darkorlight ? '' : 'dark-mode'}" draggable="true" data-index="${index + 1}" id="desire-${index}">
+            <div class="index">${index + 1}. </div>
+            <div class="item-content">${adventure}</div>
+        </div>`;
+        
+        difficultyList.innerHTML += difficultyItem;
+        desireList.innerHTML += desireItem;
     });
 
     addDragListeners();
@@ -318,4 +340,40 @@ function calculateResult() {
 
 function closeModal() {
     document.getElementById('result-modal').style.display = 'none';
+}
+
+let darkorlight = true;
+let clickCount = 0; // 初始化点击计数器
+
+function toggleTheme() {
+    clickCount++; // 每次点击时增加计数
+
+    // 检查点击次数
+    if (clickCount == 10) {
+        alert("壞掉啦~");
+        return; // 禁用开关，不再执行切换主题的逻辑
+    } else if (clickCount == 5) {
+        alert("不要玩開關");
+    } else if (clickCount > 5) {
+        return; // 禁用开关，不再执行切换主题的逻辑
+    }
+    
+    const body = document.body;
+    const elements = document.querySelectorAll('.list, .adventure-input, .button-group button, .list-item, .modal-content');
+    // 切换主题
+    body.classList.toggle('dark-mode');
+    elements.forEach((el) => {
+        el.classList.toggle('dark-mode');
+    });
+    // 更新按钮图标和状态
+    const themeSwitch = document.getElementById('theme-switch');
+    if (body.classList.contains('dark-mode')) {
+        themeSwitch.textContent = '☀️';
+        darkorlight = false;
+        localStorage.setItem('theme', 'dark');
+    } else {
+        themeSwitch.textContent = '🌙';
+        darkorlight = true;
+        localStorage.setItem('theme', 'light');
+    }
 }
