@@ -1,7 +1,8 @@
 let adventures = [];
 let draggedItem = null;
 let isCleared = true;  // 用來追蹤目前是清空狀態還是填寫狀態
-let isDragging = false;  // 新增變數，用來追蹤是否有項目在拖曳中
+let isDragging = false;
+let selectedCount = 0;  // 用來追蹤被點選的項目數量
 
 window.onload = function () {
     document.getElementById('result-modal').style.display = 'none';
@@ -46,8 +47,40 @@ document.addEventListener('click', function(event) {
     if (event.target == modal) {
         modal.style.display = "none";
     }
+
+    // 監聽 adventure-item 是否被點擊
+    if (target.classList.contains('list-item')) {
+        // 檢查是否已經點選了該項目
+        if (target.classList.contains('selected')) {
+            target.classList.remove('selected');
+            selectedCount--;  // 取消選中則減少計數
+        } else {
+            target.classList.add('selected');
+            selectedCount++;  // 選中則增加計數
+        }
+
+        // 根據點選的項目數來禁用或啟用拖曳
+        if (selectedCount >= 2) {
+            disableDrag();  // 當有兩個或更多項目被選中時禁用拖曳
+        } else {
+            enableDrag();  // 當少於兩個項目被選中時啟用拖曳
+        }
+    }
 });
 
+function disableDrag() {
+    const listItems = document.querySelectorAll('.list-item');
+    listItems.forEach(item => {
+        item.setAttribute('draggable', false);  // 禁用拖曳
+    });
+}
+
+function enableDrag() {
+    const listItems = document.querySelectorAll('.list-item');
+    listItems.forEach(item => {
+        item.setAttribute('draggable', true);  // 啟用拖曳
+    });
+}
 
 function clearAll() {
     const button = document.querySelector('.button-group button');
@@ -146,15 +179,12 @@ function dragEnd() {
     updateIndices();  // 更新序號
 }
 
-
-
 // 觸控開始
 function touchStart(e) {
-    // 檢查是否已經有項目在拖曳
-    if (isDragging) {
-        return;  // 如果有其他項目在拖曳，則禁止開始新的拖曳
+    if (isDragging || selectedCount >= 2) {
+        return;  // 禁止開始新的拖曳
     }
-
+    
     e.preventDefault();
     draggedItem = this;
     isDragging = true;  // 標記為拖曳中
@@ -182,6 +212,7 @@ function touchEnd() {
         updateIndices();  // 更新序號
     }
 }
+
 
 function dragOver(e) {
     e.preventDefault();
