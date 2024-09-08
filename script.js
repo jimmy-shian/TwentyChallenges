@@ -204,11 +204,6 @@ function touchMove(e) {
 }
 
 function touchEnd() {
-    if (e.touches.length > 1) {
-        e.preventDefault(); // 阻止双指触屏事件
-        // 在此处添加您的自定义操作，例如显示提示信息或执行其他逻辑
-        return;
-    }
     if (draggedItem) {
         draggedItem.classList.remove('dragging');
         draggedItem = null;
