@@ -181,8 +181,7 @@ function touchStart(e) {
         event.preventDefault(); // 阻止双指触屏事件
         // 在此处添加您的自定义操作，例如显示提示信息或执行其他逻辑
         return;
-      }
-    }, { passive: false });
+    }
     e.preventDefault();
     draggedItem = this;
     setTimeout(() => this.classList.add('dragging'), 0);
