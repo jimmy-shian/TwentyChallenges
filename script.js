@@ -21,7 +21,32 @@ window.onload = function () {
             document.getElementById(`adventure-${index + 1}`).value = adventure;
         });
     }
+    
+    const button = document.querySelector('.button-group button');
+
+    // 檢查是否有 `.adventure-input` 元素有內容
+    const hasContent = Array.from(document.querySelectorAll('.adventure-input')).some(input => input.value.trim() !== '');
+
+    if (hasContent) {
+        isCleared = true;
+        button.textContent = '一鍵清空';
+    } else {
+        isCleared = false;
+        button.textContent = '一鍵填寫';
+    }
+    // 切換 `isCleared` 的狀態
+    isCleared = !isCleared;
 }
+// 點擊事件處理器，處理隱藏 modal 的邏輯
+document.addEventListener('click', function(event) {
+    const modal = document.getElementById('result-modal');
+    const target = event.target;
+    // 檢查 modal 是否顯示中，並且點擊的不是 modal 內部的元素
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+});
+
 
 function clearAll() {
     const button = document.querySelector('.button-group button');
@@ -95,6 +120,8 @@ function addDragListeners() {
     listItems.forEach(item => {
         item.addEventListener('dragstart', dragStart);
         item.addEventListener('dragend', dragEnd);
+        item.addEventListener('touchstart', touchStart);
+        item.addEventListener('touchend', touchEnd);
     });
 
     lists.forEach(list => {
@@ -102,6 +129,8 @@ function addDragListeners() {
         list.addEventListener('dragenter', dragEnter);
         list.addEventListener('dragleave', dragLeave);
         list.addEventListener('drop', drop);
+        list.addEventListener('touchmove', touchMove);
+        list.addEventListener('touchend', touchEnd);
     });
 }
 
@@ -114,6 +143,31 @@ function dragEnd() {
     this.classList.remove('dragging');
     draggedItem = null;
     updateIndices();  // 更新序號
+}
+
+function touchStart(e) {
+    e.preventDefault();
+    draggedItem = this;
+    setTimeout(() => this.classList.add('dragging'), 0);
+}
+
+function touchMove(e) {
+    e.preventDefault();
+    const touch = e.touches[0];
+    const afterElement = getDragAfterElement(this, touch.clientY);
+    if (afterElement == null) {
+        this.appendChild(draggedItem);
+    } else {
+        this.insertBefore(draggedItem, afterElement);
+    }
+}
+
+function touchEnd() {
+    if (draggedItem) {
+        draggedItem.classList.remove('dragging');
+        draggedItem = null;
+        updateIndices();  // 更新序號
+    }
 }
 
 function dragOver(e) {
@@ -191,6 +245,7 @@ function calculateResult() {
 
     document.getElementById('result').innerHTML = result;
     document.getElementById('result-modal').style.display = 'block';
+    
 }
 
 function closeModal() {
