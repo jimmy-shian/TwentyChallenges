@@ -6,6 +6,8 @@ let isCleared = true;  // 用來追蹤目前是清空狀態還是填寫狀態
 
 window.onload = function () {
     document.getElementById('result-modal').style.display = 'none';
+    showLists_once();
+    
     const grid = document.querySelector('.adventure-grid');
     for (let i = 1; i <= 20; i++) {
         const div = document.createElement('div');
@@ -62,6 +64,75 @@ document.addEventListener('click', function(event) {
     }
 });
 
+function showNotification(message, duration = 3000) {
+    const notification = document.getElementById('notification');
+    const messageElement = document.getElementById('notification-message');
+    
+    // 清除之前的定時器
+    clearTimeout(notification.timer);
+    
+    // 設定訊息內容
+    messageElement.textContent = message;
+    
+    // 顯示通知
+    notification.classList.add('show');
+    notification.style.opacity = '1'; // 確保 opacity 為 1
+    
+    // 設定定時器在指定時間後隱藏通知
+    notification.timer = setTimeout(() => {
+        notification.style.opacity = '0';   // 觸發淡出效果
+        
+        // 設定一個定時器在淡出效果完成後隱藏 notification
+        setTimeout(() => {
+            notification.classList.remove('show');  // 隱藏通知
+        }, 500);  // 與淡出動畫時間一致
+    }, duration);
+}
+
+function showLists_once() {    
+    
+    const difficultyList = document.getElementById('difficulty-list');
+    const desireList = document.getElementById('desire-list');
+
+    difficultyList.innerHTML = '<h3>簡單到困難</h3>';
+    desireList.innerHTML = '<h3>不想做到想做</h3>';
+    
+    // 先檢查是否有保存的排序
+    const savedDifficultyOrder = JSON.parse(localStorage.getItem('difficultyOrder'));
+    const savedDesireOrder = JSON.parse(localStorage.getItem('desireOrder'));
+
+    try {
+        savedDifficultyOrder.forEach((adventure, index) => {
+            const difficultyItem = `<div class="list-item ${darkorlight ? '' : 'dark-mode'}" draggable="true" data-index="${index + 1}" id="diff-${index}">
+                <div class="index">${index + 1}. </div>
+                <div class="item-content">${adventure}</div>
+            </div>`;
+            difficultyList.innerHTML += difficultyItem;
+        });
+
+        savedDesireOrder.forEach((adventure, index) => {
+            const desireItem = `<div class="list-item ${darkorlight ? '' : 'dark-mode'}" draggable="true" data-index="${index + 1}" id="desire-${index}">
+                <div class="index">${index + 1}. </div>
+                <div class="item-content">${adventure}</div>
+            </div>`;
+            desireList.innerHTML += desireItem;
+        });
+        
+        document.getElementById('input-container').style.display = 'none';
+        document.getElementById('input-container2').style.display = 'none';
+        document.getElementById('lists-container').style.display = 'flex';
+        document.getElementById('sorting-buttons').style.display = 'block';
+
+        addDragListeners();
+
+        // 測試顯示通知
+        showNotification('自動載入上次排序！', 1500);
+        
+    } catch(e){
+        console.log('load error',e);
+        return;
+    }
+}
 
 function clearAll() {
     const button = document.querySelector('.button-group button');
@@ -72,10 +143,15 @@ function clearAll() {
         document.querySelectorAll('.adventure-input').forEach(input => {
             input.value = '';
         });
+        // 清空 localStorage
+        localStorage.removeItem('adventures');
+        localStorage.removeItem('difficultyOrder');
+        localStorage.removeItem('desireOrder');
         button.textContent = '一鍵填寫';
     }
     isCleared = !isCleared;
 }
+
 
 function fillRandomAdventures() {
     const randomAdventures = [
@@ -94,7 +170,8 @@ function fillRandomAdventures() {
 function saveAdventures() {
     adventures = Array.from(document.querySelectorAll('.adventure-input')).map(input => input.value.trim());
     if (adventures.some(adventure => adventure === '')) {
-        alert('請確保所有冒險事項都已填寫！');
+//        alert('請確保所有冒險事項都已填寫！');
+        showNotification('請確保所有冒險事項都已填寫！', 2000);
         return;
     }
     localStorage.setItem('adventures', JSON.stringify(adventures));
@@ -125,16 +202,16 @@ function showLists() {
             <div class="index">${index + 1}. </div>
             <div class="item-content">${adventure}</div>
         </div>`;
-        
+
         const desireItem = `<div class="list-item ${darkorlight ? '' : 'dark-mode'}" draggable="true" data-index="${index + 1}" id="desire-${index}">
             <div class="index">${index + 1}. </div>
             <div class="item-content">${adventure}</div>
         </div>`;
-        
+
         difficultyList.innerHTML += difficultyItem;
         desireList.innerHTML += desireItem;
     });
-
+    
     addDragListeners();
 }
 
@@ -233,15 +310,6 @@ function touchEnd() {
     }
 }
 
-//function dragOver(e) {
-//    e.preventDefault();
-//    const afterElement = getDragAfterElement(this, e.clientY);
-//    if (afterElement == null) {
-//        this.appendChild(draggedItem);
-//    } else {
-//        this.insertBefore(draggedItem, afterElement);
-//    }
-//}
 
 function dragEnter(e) {
     e.preventDefault();
@@ -336,6 +404,22 @@ function calculateResult() {
     document.getElementById('result').innerHTML = result;
     document.getElementById('result-modal').style.display = 'block';
     
+    try{
+        // 保存排序的列表
+        const difficultyOrder = Array.from(document.querySelectorAll('#difficulty-list .list-item'))
+            .map(item => item.querySelector('.item-content').textContent.trim());
+        const desireOrder = Array.from(document.querySelectorAll('#desire-list .list-item'))
+            .map(item => item.querySelector('.item-content').textContent.trim());
+
+        localStorage.setItem('difficultyOrder', JSON.stringify(difficultyOrder));
+        localStorage.setItem('desireOrder', JSON.stringify(desireOrder));
+        
+    } catch(e) {
+        console.log('save list error:',e);
+
+        return;
+    }
+
 }
 
 function closeModal() {
@@ -350,10 +434,13 @@ function toggleTheme() {
 
     // 检查点击次数
     if (clickCount == 10) {
-        alert("壞掉啦~");
+//        alert("壞掉啦~");
+        showNotification('壞掉啦~', 2000);
         return; // 禁用开关，不再执行切换主题的逻辑
     } else if (clickCount == 5) {
-        alert("不要玩開關");
+//        alert("不要玩開關");
+        showNotification('不要玩開關', 1500);
+
     } else if (clickCount > 10) {
         return; // 禁用开关，不再执行切换主题的逻辑
     }
