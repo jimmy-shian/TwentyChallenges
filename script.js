@@ -27,7 +27,63 @@ if (randomMessage.includes("這邊不是小朋友可以來的地方")) {
 // 输出到控制台
 console.log(randomMessage, style);
 
+
+function adjustLayout() {
+    // 檢查螢幕寬度是否為手機模式
+    const check_input_container = document.getElementById('input-container');
+    const paginationButtons = document.querySelector('.pagination-buttons');
+
+    // 判斷當前顯示的是哪個列表
+    if (window.matchMedia("(max-width: 768px)").matches && check_input_container.style.display === 'none') {
+        // 設定 pagination-buttons 為 flex
+        paginationButtons.style.display = 'flex';
+        
+        // 手機模式時的操作
+        document.getElementById('easy').style.display = 'block';
+        document.getElementById('notdo').style.display = 'none';
+
+        document.getElementById('lists-container').style.display = 'flex';
+        document.getElementById('sorting-buttons').style.display = 'block';
+        
+    } else {
+        // 非手機模式時的操作
+        paginationButtons.style.display = 'none';
+        
+        document.getElementById('easy').style.display = 'block';
+        document.getElementById('notdo').style.display = 'block';
+        
+        document.getElementById('lists-container').style.display = 'flex';
+        document.getElementById('sorting-buttons').style.display = 'block';
+    }
+    
+}
+
+window.onscroll = function() {
+    var btn = document.getElementById("scrollBtn");
+    var scrollPosition = document.documentElement.scrollTop || document.body.scrollTop;
+    var windowHeight = window.innerHeight;
+    var docHeight = document.documentElement.scrollHeight;
+
+    // 根據滾動位置決定按鈕顯示和功能
+    if (scrollPosition > windowHeight / 2) {
+        btn.style.display = "block"; // 顯示按鈕
+        btn.innerHTML = "<box-icon type='solid' name='chevrons-up' animation='fade-up'></box-icon>"; // 上
+        btn.onclick = function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' }); // 滾動到頂部
+        };
+    } else {
+        btn.style.display = "block"; // 顯示按鈕
+        btn.innerHTML = "<box-icon type='solid' name='chevrons-down' animation='fade-down'></box-icon>"; // 下
+        btn.onclick = function() {
+            window.scrollTo({ top: docHeight, behavior: 'smooth' }); // 滾動到底部
+        };
+    }
+};
+
 window.onload = function () {
+    adjustLayout();
+    document.getElementById("scrollBtn").style.display = "none";
+    
     document.getElementById('result-modal').style.display = 'none';
     showLists_once();
     
@@ -68,7 +124,7 @@ window.onload = function () {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-mode');
-        const elements = document.querySelectorAll('.list, .adventure-input, .button-group button, .list-item, .modal-content, .list-description p');
+        const elements = document.querySelectorAll('.list, .adventure-input, .button-group button, .list-item, .modal-content, .list-description p, .styled-button');
         elements.forEach((el) => {
             el.classList.add('dark-mode');
         });
@@ -86,6 +142,10 @@ document.addEventListener('click', function(event) {
         modal.style.display = "none";
     }
 });
+
+// 監聽螢幕大小改變，當改變時重新調整版面
+window.addEventListener('resize', adjustLayout);
+
 
 function showNotification(message, duration = 3000) {
     const notification = document.getElementById('notification');
@@ -141,6 +201,26 @@ function showLists_once() {
             desireList.innerHTML += desireItem;
         });
         
+        // 檢查螢幕寬度是否為手機模式
+        if (window.matchMedia("(max-width: 768px)").matches) {
+            
+            const paginationButtons = document.querySelector('.pagination-buttons');
+            paginationButtons.style.display = 'flex';
+
+            document.getElementById('input-container').style.display = 'none';
+            document.getElementById('input-container2').style.display = 'none';
+            document.getElementById('lists-container').style.display = 'flex';
+            document.getElementById('easy').style.display = 'block';
+            document.getElementById('notdo').style.display = 'none';
+
+            document.getElementById('sorting-buttons').style.display = 'block';
+
+            addDragListeners();
+
+            return; // 結束函數
+        }
+
+        // 非手機模式，執行原本的操作
         document.getElementById('input-container').style.display = 'none';
         document.getElementById('input-container2').style.display = 'none';
         document.getElementById('lists-container').style.display = 'flex';
@@ -217,6 +297,13 @@ function editAdventures() {
 }
 
 function showLists() {
+        // 檢查螢幕寬度是否為手機模式
+    if (window.matchMedia("(max-width: 768px)").matches) {
+        showLists_phone();  // 如果是手機模式，執行手機專屬的函數
+        return; // 結束函數
+    }
+    
+    // 非手機模式，執行原本的操作
     document.getElementById('input-container').style.display = 'none';
     document.getElementById('input-container2').style.display = 'none';
     document.getElementById('lists-container').style.display = 'flex';
@@ -405,6 +492,18 @@ function updateIndices() {
 }
 
 function calculateResult() {
+    if (!isChangePageCalled) {
+        const confirmation = confirm("尚未排序另一個項目，是否確定完成?");
+        if (confirmation) {
+            // 用戶選擇確定，執行計算結果
+            console.log("Calculating results...");
+            // 在此處添加計算結果的邏輯
+        } else {
+            // 用戶選擇取消，跳轉到 changePage()
+            changePage();
+            return;
+        }
+    }
     const difficultyOrder = Array.from(document.querySelectorAll('#difficulty-list .list-item .item-content'))
         .map(item => item.textContent.trim());
     const desireOrder = Array.from(document.querySelectorAll('#desire-list .list-item .item-content'))
@@ -447,7 +546,7 @@ function calculateResult() {
     let result = '<ul>';
 
     for (let i = 0; i < topN; i++) {
-        result += `<li>第${i + 1}名: ${scores[i].item}, 分數: ${scores[i].score}</li>`;
+        result += `<li>　第${i + 1}名： ${scores[i].item}</li>`;
     }
 
     result += '</ul>';
@@ -496,7 +595,7 @@ function toggleTheme() {
     }
     
     const body = document.body;
-    const elements = document.querySelectorAll('.list, .adventure-input, .button-group button, .list-item, .modal-content, .list-description p');
+    const elements = document.querySelectorAll('.list, .adventure-input, .button-group button, .list-item, .modal-content, .list-description p, .styled-button');
     // 切换主题
     body.classList.toggle('dark-mode');
     elements.forEach((el) => {
@@ -513,4 +612,69 @@ function toggleTheme() {
         darkorlight = true;
         localStorage.setItem('theme', 'light');
     }
+}
+
+function showLists_phone(){
+    document.getElementById('input-container').style.display = 'none';
+    document.getElementById('input-container2').style.display = 'none';
+    document.getElementById('lists-container').style.display = 'flex';
+    document.getElementById('easy').style.display = 'block';
+    document.getElementById('notdo').style.display = 'none';
+
+
+    document.getElementById('sorting-buttons').style.display = 'block';
+
+    const difficultyList = document.getElementById('difficulty-list');
+    const desireList = document.getElementById('desire-list');
+
+    difficultyList.innerHTML = '<h3>簡單到困難</h3>';
+    desireList.innerHTML = '<h3>想做到不想做</h3>';
+
+    adventures.forEach((adventure, index) => {
+        const difficultyItem = `<div class="list-item ${darkorlight ? '' : 'dark-mode'}" draggable="true" data-index="${index + 1}" id="diff-${index}">
+            <div class="index">${index + 1}. </div>
+            <div class="item-content">${adventure}</div>
+        </div>`;
+
+        const desireItem = `<div class="list-item ${darkorlight ? '' : 'dark-mode'}" draggable="true" data-index="${index + 1}" id="desire-${index}">
+            <div class="index">${index + 1}. </div>
+            <div class="item-content">${adventure}</div>
+        </div>`;
+
+        difficultyList.innerHTML += difficultyItem;
+        desireList.innerHTML += desireItem;
+    });
+    
+    addDragListeners();
+}
+let isChangePageCalled = false; // 追蹤是否已經調用 changePage()
+
+function changePage() {
+    // 此函數的內容可以根據需求修改
+    isChangePageCalled = true; // 當此函數被調用時，設置為 true
+
+    const easyList = document.getElementById('easy');
+    const notdoList = document.getElementById('notdo');
+    const changePageButton = document.getElementById('changePage');
+
+    // 判斷當前顯示的是哪個列表
+    if (easyList.style.display === 'block') {
+        // 如果 easy 列表顯示中，則切換到 notdo 列表
+        easyList.style.display = 'none';
+        notdoList.style.display = 'block';
+        // 更改按鈕文字為 "前往簡單排序"
+        changePageButton.innerText = "前往簡單困難排序";
+    } else {
+        // 如果 notdo 列表顯示中，則切換到 easy 列表
+        easyList.style.display = 'block';
+        notdoList.style.display = 'none';
+        // 更改按鈕文字為 "前往困難排序"
+        changePageButton.innerText = "前往想不想做排序";
+    }
+
+    // 快速滾動到頁面最上面
+    window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+    });
 }
