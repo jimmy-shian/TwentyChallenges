@@ -81,7 +81,7 @@ window.onscroll = function() {
 };
 
 window.onload = function () {
-    adjustLayout();
+//    adjustLayout();
     document.getElementById("scrollBtn").style.display = "none";
     
     document.getElementById('result-modal').style.display = 'none';
@@ -294,6 +294,9 @@ function editAdventures() {
     document.getElementById('input-container2').style.display = 'block';
     document.getElementById('lists-container').style.display = 'none';
     document.getElementById('sorting-buttons').style.display = 'none';
+    const paginationButtons = document.querySelector('.pagination-buttons');
+    paginationButtons.style.display = 'none';
+
 }
 
 function showLists() {
@@ -621,6 +624,8 @@ function showLists_phone(){
     document.getElementById('easy').style.display = 'block';
     document.getElementById('notdo').style.display = 'none';
 
+    const paginationButtons = document.querySelector('.pagination-buttons');
+    paginationButtons.style.display = 'flex';
 
     document.getElementById('sorting-buttons').style.display = 'block';
 
