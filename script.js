@@ -3,6 +3,29 @@ let draggedItem = null;
 let draggedItemOriginalPosition = null;
 
 let isCleared = true;  // 用來追蹤目前是清空狀態還是填寫狀態
+const messages = [
+    "%c不要亂看，再看打你屁股!!",
+    "%c這邊不是小朋友可以來的地方喔~!",
+    "%c請離開這裡，這是禁區!",
+    "%c你這樣不可以喔，滾!",
+    "%c不要再偷看了..."
+];
+
+// 随机选择一条信息
+const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+
+// 根据选择的消息设置颜色和样式
+let style = "color: red; font-size: 24px; font-weight: bold;"; // 默认样式
+
+// 判断消息内容并设置相应的样式
+if (randomMessage.includes("這邊不是小朋友可以來的地方")) {
+    style = "color: #DAA520; font-size: 24px; font-weight: bold;"; // 深黃色
+} else if (randomMessage.includes("你這樣不可以喔，滾!")) {
+    style = "color: #DAA520; font-size: 24px; font-weight: bold;"; // 深黃色
+}
+
+// 输出到控制台
+console.log(randomMessage, style);
 
 window.onload = function () {
     document.getElementById('result-modal').style.display = 'none';
@@ -45,7 +68,7 @@ window.onload = function () {
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'dark') {
         document.body.classList.add('dark-mode');
-        const elements = document.querySelectorAll('.list, .adventure-input, .button-group button, .list-item, .modal-content');
+        const elements = document.querySelectorAll('.list, .adventure-input, .button-group button, .list-item, .modal-content, .list-description p');
         elements.forEach((el) => {
             el.classList.add('dark-mode');
         });
@@ -160,21 +183,29 @@ function fillRandomAdventures() {
         '北極圈探險', '洞穴探險', '熱氣球旅行', '越野賽車'
     ];
 
-    // 將冒險事項隨機排列後填入 20 格
+    // 將冒險事項隨機排列
     const shuffledAdventures = randomAdventures.sort(() => 0.5 - Math.random());
-    document.querySelectorAll('.adventure-input').forEach((input, index) => {
-        input.value = shuffledAdventures[index];
+    let adventureIndex = 0;
+
+    // 遍歷每個 .adventure-input，僅填入空白的格子
+    document.querySelectorAll('.adventure-input').forEach((input) => {
+        if (input.value.trim() === '' && adventureIndex < shuffledAdventures.length) {
+            input.value = shuffledAdventures[adventureIndex];
+            adventureIndex++;
+        }
     });
 }
 
 function saveAdventures() {
-    adventures = Array.from(document.querySelectorAll('.adventure-input')).map(input => input.value.trim());
-    if (adventures.some(adventure => adventure === '')) {
-//        alert('請確保所有冒險事項都已填寫！');
-        showNotification('請確保所有冒險事項都已填寫！', 2000);
-        return;
-    }
+    // 只保存非空白的冒險事項
+    adventures = Array.from(document.querySelectorAll('.adventure-input'))
+        .map(input => input.value.trim())
+        .filter(adventure => adventure !== '');  // 過濾掉空白項目
+
+    // 將已填寫的冒險事項存入 localStorage
     localStorage.setItem('adventures', JSON.stringify(adventures));
+    
+    // 顯示冒險清單
     showLists();
 }
 
@@ -195,7 +226,7 @@ function showLists() {
     const desireList = document.getElementById('desire-list');
 
     difficultyList.innerHTML = '<h3>簡單到困難</h3>';
-    desireList.innerHTML = '<h3>不想做到想做</h3>';
+    desireList.innerHTML = '<h3>想做到不想做</h3>';
 
     adventures.forEach((adventure, index) => {
         const difficultyItem = `<div class="list-item ${darkorlight ? '' : 'dark-mode'}" draggable="true" data-index="${index + 1}" id="diff-${index}">
@@ -379,32 +410,52 @@ function calculateResult() {
     const desireOrder = Array.from(document.querySelectorAll('#desire-list .list-item .item-content'))
         .map(item => item.textContent.trim());
 
+    const totalItems = difficultyOrder.length;
+
+    // 計算難度分數（第一項和最後一項分數為1，往中間越高）
+    const difficultyScores = difficultyOrder.map((_, index) => {
+        const midIndex = Math.floor(totalItems / 2);
+        return index < midIndex
+            ? index + 1  // 前半部越靠前分數越低
+            : totalItems - index;  // 後半部越靠後分數越低
+    });
+
+    // 計算欲望分數（第一項最高，最後一項為1）
+    const desireScores = desireOrder.map((_, index) => totalItems - index);
+
     // 計算兩個列表對應項目的乘積
     const scores = difficultyOrder.map((diff, index) => {
         const desireIndex = desireOrder.indexOf(diff);
+        const diffScore = difficultyScores[index];
+        const desireScore = desireScores[desireIndex];
         return {
             item: diff,
-            score: (index + 1) * (desireIndex + 1)  // 使用索引相乘
+            score: diffScore * desireScore,  // 使用分數相乘
+            difficultyIndex: index           // 紀錄項目在原始 difficultyOrder 的順序
         };
     });
 
-    // 按分數排序並找出中位數
-    scores.sort((a, b) => a.score - b.score);
-    const midIndex1 = Math.floor((scores.length - 1) / 2);
-    const midIndex2 = scores.length % 2 === 0 ? midIndex1 + 1 : midIndex1;
+    // 按分數排序，當分數相同時以 difficultyOrder 的順序作為次排序條件
+    scores.sort((a, b) => {
+        if (b.score === a.score) {
+            return a.difficultyIndex - b.difficultyIndex;  // 同分時按原始順序
+        }
+        return b.score - a.score;  // 主要依據分數由高到低排序
+    });
 
-    // 顯示中位數的兩個項目
+    const topN = totalItems < 13 ? 3 : 5;  // 根據項目數量決定產生幾個
     let result = '<ul>';
-    result += `<li>中位數項目1: ${scores[midIndex1].item}, 分數: ${scores[midIndex1].score}</li>`;
-    if (midIndex1 !== midIndex2) {
-        result += `<li>中位數項目2: ${scores[midIndex2].item}, 分數: ${scores[midIndex2].score}</li>`;
+
+    for (let i = 0; i < topN; i++) {
+        result += `<li>第${i + 1}名: ${scores[i].item}, 分數: ${scores[i].score}</li>`;
     }
+
     result += '</ul>';
 
     document.getElementById('result').innerHTML = result;
     document.getElementById('result-modal').style.display = 'block';
-    
-    try{
+
+    try {
         // 保存排序的列表
         const difficultyOrder = Array.from(document.querySelectorAll('#difficulty-list .list-item'))
             .map(item => item.querySelector('.item-content').textContent.trim());
@@ -413,14 +464,13 @@ function calculateResult() {
 
         localStorage.setItem('difficultyOrder', JSON.stringify(difficultyOrder));
         localStorage.setItem('desireOrder', JSON.stringify(desireOrder));
-        
-    } catch(e) {
-        console.log('save list error:',e);
 
+    } catch (e) {
+        console.log('save list error:', e);
         return;
     }
-
 }
+
 
 function closeModal() {
     document.getElementById('result-modal').style.display = 'none';
@@ -446,7 +496,7 @@ function toggleTheme() {
     }
     
     const body = document.body;
-    const elements = document.querySelectorAll('.list, .adventure-input, .button-group button, .list-item, .modal-content');
+    const elements = document.querySelectorAll('.list, .adventure-input, .button-group button, .list-item, .modal-content, .list-description p');
     // 切换主题
     body.classList.toggle('dark-mode');
     elements.forEach((el) => {

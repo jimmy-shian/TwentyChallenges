@@ -28,11 +28,24 @@
         </div>
     </div>
     <div id="lists-container" style="display: none;">
-        <div id="difficulty-list" class="list" data-description="簡單到困難 (1最簡單，20最困難)">
-        </div><br>
-        <div id="desire-list" class="list" data-description="不想做到想做 (1最不想做，20最想做)">
-        </div><br>
+        <div class="list-contain">
+            <div class="list-description easy">
+                <p data-message="(1最容易，20最困難)">從你認為最容易的開始排</p>
+            </div>
+            <div id="difficulty-list" class="list">
+            </div>
+        </div>
+        <br>
+        <div class="list-contain">
+            <div class="list-description notdo">
+                <p data-message="(1最想做，20最不想做)">從你最想做的開始排</p>
+            </div>
+            <div id="desire-list" class="list">
+            </div>
+        </div>
+        <br>
     </div>
+
     <div class="button-group" id="sorting-buttons" style="display: none;">
         <button onclick="editAdventures()">更改冒險事項</button>
         <button onclick="calculateResult()">完成</button>

@@ -18,7 +18,7 @@ body {
 }
 
 h2, h3 {
-    color: #89B166;
+    color: #384929;
 }
 
 .adventure-grid {
@@ -45,9 +45,57 @@ h2, h3 {
     justify-content: space-between;
 }
 
-.list {
+.list-contain {
     margin: 6px;
     width: 45%;
+    padding: 10px;
+    min-height: 400px;
+    position: relative;
+}
+.list-description {
+    margin: 6px;
+    padding: 10px;
+    display: flex;
+    width: 95%;
+    flex-wrap: wrap;
+}
+.list-description p {
+    margin: 0;
+    position: relative;
+    background: linear-gradient(to top, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0)); /* 渐变从白色到透明 */
+}
+
+    /* hover 时显示的提示文本 */
+    .list-description.easy p:hover:after,
+    .list-description.notdo p:hover:after {
+        content: attr(data-message); /* 使用 data-message 属性中的文本 */
+        position: absolute; /* 绝对定位 */
+        bottom: -30px; /* 距离底部20px */
+        right: -40px; /* 距离右边0 */
+        background-color: rgba(255, 255, 255, 0.8); /* 半透明白底 */
+        padding: 5px 10px; /* 内边距 */
+        border-radius: 4px; /* 圆角 */
+        visibility: visible; /* hover 时显示 */
+        opacity: 1;
+        font-size: 0.9em;
+        color: #969696;
+        white-space: nowrap;
+        transition: opacity 0.2s ease-in-out; /* 过渡效果 */
+        z-index: 999;
+    }
+
+        .list-description p:after {
+            content: ""; /* 默认内容为空 */
+            visibility: hidden; /* 默认隐藏 */
+            opacity: 0; /* 默认透明 */
+            transition: visibility 0s, opacity 0.2s ease-in-out; /* 过渡效果 */
+        }
+
+
+
+.list {
+    margin: 6px;
+    width: 90%;
     border: 1px solid #ccc;
     padding: 10px;
     min-height: 400px;
@@ -218,7 +266,9 @@ body.dark-mode {
     background-color: #3C4047;
     border-color: #6875F5;
 }
-
+    .list.dark-mode h3{
+        color: #e3f0f0;
+    }
 .list-item.dark-mode .index {
     background-color: #314122;
 }
@@ -232,6 +282,11 @@ body.dark-mode {
     background-color: #4e4e4e;
     border: 2px solid #f4f2d1; 
 }
+
+.list-description p.dark-mode {
+    background: linear-gradient(to top, rgba(60, 60, 60, 0.8), rgba(60, 60, 60, 0)); /* 深色渐层背景 */
+}
+
 /* 電燈開關的樣式 */
 #theme-switch {
     position: fixed;
