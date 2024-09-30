@@ -45,7 +45,7 @@ function adjustLayout() {
         document.getElementById('lists-container').style.display = 'flex';
         document.getElementById('sorting-buttons').style.display = 'block';
         
-    } else {
+    } else if(check_input_container.style.display === 'none') {
         // 非手機模式時的操作
         paginationButtons.style.display = 'none';
         
@@ -311,7 +311,10 @@ function showLists() {
     document.getElementById('input-container2').style.display = 'none';
     document.getElementById('lists-container').style.display = 'flex';
     document.getElementById('sorting-buttons').style.display = 'block';
-
+    
+    document.getElementById('easy').style.display = 'block';
+    document.getElementById('notdo').style.display = 'block';
+    
     const difficultyList = document.getElementById('difficulty-list');
     const desireList = document.getElementById('desire-list');
 
