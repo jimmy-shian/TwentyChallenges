@@ -178,7 +178,7 @@ function showLists_once() {
     const desireList = document.getElementById('desire-list');
 
     difficultyList.innerHTML = '<h3>簡單到困難</h3>';
-    desireList.innerHTML = '<h3>不想做到想做</h3>';
+    desireList.innerHTML = '<h3>想做到不想做</h3>';
     
     // 先檢查是否有保存的排序
     const savedDifficultyOrder = JSON.parse(localStorage.getItem('difficultyOrder'));
