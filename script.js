@@ -131,6 +131,19 @@ window.onload = function () {
         document.getElementById('theme-switch').textContent = '☀️';
         darkorlight = false;
     }
+    
+    const easyList = document.getElementById('easy');
+    const notdoList = document.getElementById('notdo');
+    const changePageButton = document.getElementById('changePage');
+
+    // 判斷當前顯示的是哪個列表
+    if (easyList.style.display === 'block') {
+        // 更改按鈕文字為 "前往簡單排序"
+        changePageButton.innerText = "前往 簡單困難 排序";
+    } else {
+        // 更改按鈕文字為 "前往困難排序"
+        changePageButton.innerText = "前往 想不想做 排序";
+    }
 }
 
 // 點擊事件處理器，處理隱藏 modal 的邏輯
@@ -281,6 +294,12 @@ function saveAdventures() {
     adventures = Array.from(document.querySelectorAll('.adventure-input'))
         .map(input => input.value.trim())
         .filter(adventure => adventure !== '');  // 過濾掉空白項目
+
+    // 檢查使用者是否填寫了至少三個項目
+    if (adventures.length < 3) {
+        alert('請至少填寫三個冒險事項。');
+        return;  // 停止執行，避免保存空白項目
+    }
 
     // 將已填寫的冒險事項存入 localStorage
     localStorage.setItem('adventures', JSON.stringify(adventures));
