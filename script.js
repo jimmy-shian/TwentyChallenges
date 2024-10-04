@@ -139,10 +139,10 @@ window.onload = function () {
     // 判斷當前顯示的是哪個列表
     if (easyList.style.display === 'block') {
         // 更改按鈕文字為 "前往簡單排序"
-        changePageButton.innerText = "前往 簡單困難 排序";
+        changePageButton.innerText = "前往 想不想做 排序";
     } else {
         // 更改按鈕文字為 "前往困難排序"
-        changePageButton.innerText = "前往 想不想做 排序";
+        changePageButton.innerText = "前往 簡單困難 排序";
     }
 }
 
@@ -697,13 +697,13 @@ function changePage() {
         easyList.style.display = 'none';
         notdoList.style.display = 'block';
         // 更改按鈕文字為 "前往簡單排序"
-        changePageButton.innerText = "前往簡單困難排序";
+        changePageButton.innerText = "前往 簡單困難 排序";
     } else {
         // 如果 notdo 列表顯示中，則切換到 easy 列表
         easyList.style.display = 'block';
         notdoList.style.display = 'none';
         // 更改按鈕文字為 "前往困難排序"
-        changePageButton.innerText = "前往想不想做排序";
+        changePageButton.innerText = "前往 想不想做 排序";
     }
 
     // 快速滾動到頁面最上面
