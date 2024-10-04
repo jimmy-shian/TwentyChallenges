@@ -7,7 +7,7 @@ const messages = [
     "%c不要亂看，再看打你屁股!!",
     "%c這邊不是小朋友可以來的地方喔~!",
     "%c請離開這裡，這是禁區!",
-    "%c你這樣不可以喔，滾!",
+    "%c你這樣不可以喔，滾!!",
     "%c不要再偷看了..."
 ];
 
@@ -20,7 +20,7 @@ let style = "color: red; font-size: 24px; font-weight: bold;"; // 默认样式
 // 判断消息内容并设置相应的样式
 if (randomMessage.includes("這邊不是小朋友可以來的地方")) {
     style = "color: #DAA520; font-size: 24px; font-weight: bold;"; // 深黃色
-} else if (randomMessage.includes("你這樣不可以喔，滾!")) {
+} else if (randomMessage.includes("你這樣不可以喔，滾!!")) {
     style = "color: #DAA520; font-size: 24px; font-weight: bold;"; // 深黃色
 }
 
@@ -61,11 +61,11 @@ function adjustLayout() {
 window.onscroll = function() {
     var btn = document.getElementById("scrollBtn");
     var scrollPosition = document.documentElement.scrollTop || document.body.scrollTop;
-    var windowHeight = window.innerHeight;
+    var windowHeight = document.documentElement.scrollHeight;
     var docHeight = document.documentElement.scrollHeight;
 
     // 根據滾動位置決定按鈕顯示和功能
-    if (scrollPosition > windowHeight / 2) {
+    if (scrollPosition >= windowHeight / 2) {
         btn.style.display = "block"; // 顯示按鈕
         btn.innerHTML = "<box-icon type='solid' name='chevrons-up' animation='fade-up'></box-icon>"; // 上
         btn.onclick = function() {
@@ -160,7 +160,7 @@ document.addEventListener('click', function(event) {
 window.addEventListener('resize', adjustLayout);
 
 
-function showNotification(message, duration = 3000) {
+function showNotification(message, duration = 3000, backgroundColor = null) {
     const notification = document.getElementById('notification');
     const messageElement = document.getElementById('notification-message');
     
@@ -169,6 +169,14 @@ function showNotification(message, duration = 3000) {
     
     // 設定訊息內容
     messageElement.textContent = message;
+    
+    // 設定背景顏色，如果有指定
+    if (backgroundColor) {
+        notification.style.backgroundColor = backgroundColor;
+    } else {
+        // 如果未指定背景色，則使用默認樣式
+        notification.style.backgroundColor = ''; 
+    }
     
     // 顯示通知
     notification.classList.add('show');
@@ -184,6 +192,8 @@ function showNotification(message, duration = 3000) {
         }, 500);  // 與淡出動畫時間一致
     }, duration);
 }
+
+
 
 function showLists_once() {    
     
@@ -227,17 +237,14 @@ function showLists_once() {
             document.getElementById('notdo').style.display = 'none';
 
             document.getElementById('sorting-buttons').style.display = 'block';
-
-            addDragListeners();
-
-            return; // 結束函數
+            
+        }else{
+            // 非手機模式，執行原本的操作
+            document.getElementById('input-container').style.display = 'none';
+            document.getElementById('input-container2').style.display = 'none';
+            document.getElementById('lists-container').style.display = 'flex';
+            document.getElementById('sorting-buttons').style.display = 'block';            
         }
-
-        // 非手機模式，執行原本的操作
-        document.getElementById('input-container').style.display = 'none';
-        document.getElementById('input-container2').style.display = 'none';
-        document.getElementById('lists-container').style.display = 'flex';
-        document.getElementById('sorting-buttons').style.display = 'block';
 
         addDragListeners();
 
@@ -609,11 +616,11 @@ function toggleTheme() {
     // 检查点击次数
     if (clickCount == 10) {
 //        alert("壞掉啦~");
-        showNotification('壞掉啦~', 2000);
+        showNotification('壞掉啦~', 2000, 'red');
         return; // 禁用开关，不再执行切换主题的逻辑
     } else if (clickCount == 5) {
 //        alert("不要玩開關");
-        showNotification('不要玩開關', 1500);
+        showNotification('不要玩開關', 1500, 'pink');
 
     } else if (clickCount > 10) {
         return; // 禁用开关，不再执行切换主题的逻辑

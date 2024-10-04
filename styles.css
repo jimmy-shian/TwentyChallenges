@@ -483,4 +483,7 @@ body.dark-mode h2{
         min-height: 400px;
         position: relative;
     }
+    .list-item {
+        padding: 10px;
+    }
 }
