@@ -1,197 +1,192 @@
-let adventures = [];
-let draggedItem = null;
-let draggedItemOriginalPosition = null;
+//$(document).ready(function() {
+    let adventures = [];
+    let draggedItem = null;
+    let draggedItemOriginalPosition = null;
 
-let isCleared = true;  // 用來追蹤目前是清空狀態還是填寫狀態
-const messages = [
-    "%c不要亂看，再看打你屁股!!",
-    "%c這邊不是小朋友可以來的地方喔~!",
-    "%c請離開這裡，這是禁區!",
-    "%c你這樣不可以喔，滾!!",
-    "%c不要再偷看了..."
-];
+    let isCleared = true;  // 用來追蹤目前是清空狀態還是填寫狀態
+    const messages = [
+        "%c不要亂看，再看打你屁股!!",
+        "%c這邊不是小朋友可以來的地方喔~!",
+        "%c請離開這裡，這是禁區!",
+        "%c你這樣不可以喔，滾!!",
+        "%c不要再偷看了..."
+    ];
 
-// 随机选择一条信息
-const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+    // 隨機選擇一條信息
+    const randomMessage = messages[Math.floor(Math.random() * messages.length)];
 
-// 根据选择的消息设置颜色和样式
-let style = "color: red; font-size: 24px; font-weight: bold;"; // 默认样式
+    // 根據選擇的消息設置顏色和樣式
+    let style = "color: red; font-size: 24px; font-weight: bold;"; // 預設樣式
 
-// 判断消息内容并设置相应的样式
-if (randomMessage.includes("這邊不是小朋友可以來的地方")) {
-    style = "color: #DAA520; font-size: 24px; font-weight: bold;"; // 深黃色
-} else if (randomMessage.includes("你這樣不可以喔，滾!!")) {
-    style = "color: #DAA520; font-size: 24px; font-weight: bold;"; // 深黃色
-}
-
-// 输出到控制台
-console.log(randomMessage, style);
-
-
-function adjustLayout() {
-    // 檢查螢幕寬度是否為手機模式
-    const check_input_container = document.getElementById('input-container');
-    const paginationButtons = document.querySelector('.pagination-buttons');
-
-    // 判斷當前顯示的是哪個列表
-    if (window.matchMedia("(max-width: 768px)").matches && check_input_container.style.display === 'none') {
-        // 設定 pagination-buttons 為 flex
-        paginationButtons.style.display = 'flex';
-        
-        // 手機模式時的操作
-        document.getElementById('easy').style.display = 'block';
-        document.getElementById('notdo').style.display = 'none';
-
-        document.getElementById('lists-container').style.display = 'flex';
-        document.getElementById('sorting-buttons').style.display = 'block';
-        
-    } else if(check_input_container.style.display === 'none') {
-        // 非手機模式時的操作
-        paginationButtons.style.display = 'none';
-        
-        document.getElementById('easy').style.display = 'block';
-        document.getElementById('notdo').style.display = 'block';
-        
-        document.getElementById('lists-container').style.display = 'flex';
-        document.getElementById('sorting-buttons').style.display = 'block';
-    }
-    
-}
-
-window.onscroll = function() {
-    var btn = document.getElementById("scrollBtn");
-    var scrollPosition = document.documentElement.scrollTop || document.body.scrollTop;
-    var windowHeight = document.documentElement.scrollHeight;
-    var docHeight = document.documentElement.scrollHeight;
-
-    // 根據滾動位置決定按鈕顯示和功能
-    if (scrollPosition >= windowHeight / 2) {
-        btn.style.display = "block"; // 顯示按鈕
-        btn.innerHTML = "<box-icon type='solid' name='chevrons-up' animation='fade-up'></box-icon>"; // 上
-        btn.onclick = function() {
-            window.scrollTo({ top: 0, behavior: 'smooth' }); // 滾動到頂部
-        };
-    } else {
-        btn.style.display = "block"; // 顯示按鈕
-        btn.innerHTML = "<box-icon type='solid' name='chevrons-down' animation='fade-down'></box-icon>"; // 下
-        btn.onclick = function() {
-            window.scrollTo({ top: docHeight, behavior: 'smooth' }); // 滾動到底部
-        };
-    }
-};
-
-window.onload = function () {
-//    adjustLayout();
-    document.getElementById("scrollBtn").style.display = "none";
-    
-    document.getElementById('result-modal').style.display = 'none';
-    showLists_once();
-    
-    const grid = document.querySelector('.adventure-grid');
-    for (let i = 1; i <= 20; i++) {
-        const div = document.createElement('div');
-        div.innerHTML = `
-            <label for="adventure-${i}">第${i}個冒險：</label>
-            <input type="text" id="adventure-${i}" class="adventure-input">
-        `;
-        grid.appendChild(div);
+    // 判斷消息內容並設置相應的樣式
+    if (randomMessage.includes("這邊不是小朋友可以來的地方")) {
+        style = "color: #DAA520; font-size: 24px; font-weight: bold;"; // 深黃色
+    } else if (randomMessage.includes("你這樣不可以喔，滾!!")) {
+        style = "color: #DAA520; font-size: 24px; font-weight: bold;"; // 深黃色
     }
 
-    const savedAdventures = localStorage.getItem('adventures');
-    if (savedAdventures) {
-        adventures = JSON.parse(savedAdventures);
-        adventures.forEach((adventure, index) => {
-            document.getElementById(`adventure-${index + 1}`).value = adventure;
-        });
+    // 輸出到控制台
+    console.log(randomMessage, style);
+
+    function adjustLayout() {
+        // 檢查螢幕寬度是否為手機模式
+        const check_input_container = $('#input-container');
+        const paginationButtons = $('.pagination-buttons');
+
+        // 判斷當前顯示的是哪個列表
+        if ($(window).width() <= 768 && check_input_container.css('display') === 'none') {
+            // 設定 pagination-buttons 為 flex
+            paginationButtons.css('display', 'flex');
+
+            // 手機模式時的操作
+            $('#easy').css('display', 'block');
+            $('#notdo').css('display', 'none');
+
+            $('#lists-container').css('display', 'flex');
+            $('#sorting-buttons').css('display', 'block');
+
+        } else if (check_input_container.css('display') === 'none') {
+            // 非手機模式時的操作
+            paginationButtons.css('display', 'none');
+
+            $('#easy').css('display', 'block');
+            $('#notdo').css('display', 'block');
+
+            $('#lists-container').css('display', 'flex');
+            $('#sorting-buttons').css('display', 'block');
+        }
     }
-    
-    const button = document.querySelector('.button-group button');
 
-    // 檢查是否有 `.adventure-input` 元素有內容
-    const hasContent = Array.from(document.querySelectorAll('.adventure-input')).some(input => input.value.trim() !== '');
+    $(window).scroll(function() {
+        var btn = $("#scrollBtn");
+        var scrollPosition = $(document).scrollTop();
+        var windowHeight = $(document).height();
+        var docHeight = $(document).height();
 
-    if (hasContent) {
-        isCleared = true;
-        button.textContent = '一鍵清空';
-    } else {
-        isCleared = false;
-        button.textContent = '一鍵填寫';
+        // 根據滾動位置決定按鈕顯示和功能
+        if (scrollPosition >= windowHeight / 2) {
+            btn.css('display', 'block'); // 顯示按鈕
+            btn.html("<box-icon type='solid' name='chevrons-up' animation='fade-up'></box-icon>"); // 上
+            btn.off('click').on('click', function() {
+                $('html, body').animate({ scrollTop: 0 }, 'smooth'); // 滾動到頂部
+            });
+        } else {
+            btn.css('display', 'block'); // 顯示按鈕
+            btn.html("<box-icon type='solid' name='chevrons-down' animation='fade-down'></box-icon>"); // 下
+            btn.off('click').on('click', function() {
+                $('html, body').animate({ scrollTop: docHeight }, 'smooth'); // 滾動到底部
+            });
+        }
+    });
+
+    $(window).on('load', function() {
+        $("#scrollBtn").css('display', 'none');
+
+        $('#result-modal').css('display', 'none');
+        showLists_once();
+
+        const grid = $('.adventure-grid');
+        for (let i = 1; i <= 20; i++) {
+            const div = $(`
+                <div>
+                    <label for="adventure-${i}">第${i}個冒險：</label>
+                    <input type="text" id="adventure-${i}" class="adventure-input">
+                </div>
+            `);
+            grid.append(div);
+        }
+
+        const savedAdventures = localStorage.getItem('adventures');
+        if (savedAdventures) {
+            adventures = JSON.parse(savedAdventures);
+            adventures.forEach((adventure, index) => {
+                $(`#adventure-${index + 1}`).val(adventure);
+            });
+        }
+
+        const button = document.querySelector('.button-group button');
+
+        // 檢查是否有 `.adventure-input` 元素有內容
+        const hasContent = $('.adventure-input').toArray().some(input => $(input).val().trim() !== '');
+        if (hasContent) {
+            isCleared = true;
+            button.textContent = '一鍵清空';
+        } else {
+            isCleared = false;
+            button.textContent = '一鍵填寫';
+        }
+        // 切換 `isCleared` 的狀態
+        isCleared = !isCleared;
+
+        // 應用保存的主題
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'dark') {
+            $('body').addClass('dark-mode');
+            $('.list, .adventure-input, .button-group button, .list-item, .modal-content, .list-description p, .styled-button').addClass('dark-mode');
+            $('#theme-switch').text('☀️');
+            darkorlight = false;
+        }
+
+        const easyList = $('#easy');
+        const notdoList = $('#notdo');
+        const changePageButton = $('#changePage');
+
+        // 判斷當前顯示的是哪個列表
+        if (easyList.css('display') === 'block') {
+            // 更改按鈕文字為 "前往簡單排序"
+            changePageButton.text("前往 想不想做 排序");
+        } else {
+            // 更改按鈕文字為 "前往困難排序"
+            changePageButton.text("前往 簡單困難 排序");
+        }
+    });
+
+    // 點擊事件處理器，處理隱藏 modal 的邏輯
+    $(document).on('click', function(event) {
+        const modal = $('#result-modal');
+        // 檢查 modal 是否顯示中，並且點擊的不是 modal 內部的元素
+        if (event.target === modal[0]) {
+            modal.css('display', "none");
+        }
+    });
+
+    // 監聽螢幕大小改變，當改變時重新調整版面
+    $(window).on('resize', adjustLayout);
+
+    function showNotification(message, duration = 3000, backgroundColor = null) {
+        const notification = $('#notification');
+        const messageElement = $('#notification-message');
+
+        // 清除之前的定時器
+        clearTimeout(notification.data('timer'));
+
+        // 設定訊息內容
+        messageElement.text(message);
+
+        // 設定背景顏色，如果有指定
+        if (backgroundColor) {
+            notification.css('color', backgroundColor === "pink" ? "black" : "");
+            notification.css('background-color', backgroundColor);
+        } else {
+            // 如果未指定背景色，則使用默認樣式
+            notification.css('background-color', ''); 
+        }
+
+        // 顯示通知
+        notification.addClass('show');
+        notification.css('opacity', '1'); // 確保 opacity 為 1
+
+        // 設定定時器在指定時間後隱藏通知
+        notification.data('timer', setTimeout(() => {
+            notification.css('opacity', '0');   // 觸發淡出效果
+
+            // 設定一個定時器在淡出效果完成後隱藏 notification
+            setTimeout(() => {
+                notification.removeClass('show');  // 隱藏通知
+            }, 500);  // 與淡出動畫時間一致
+        }, duration));
     }
-    // 切換 `isCleared` 的狀態
-    isCleared = !isCleared;
-    
-        // 应用保存的主题
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme === 'dark') {
-        document.body.classList.add('dark-mode');
-        const elements = document.querySelectorAll('.list, .adventure-input, .button-group button, .list-item, .modal-content, .list-description p, .styled-button');
-        elements.forEach((el) => {
-            el.classList.add('dark-mode');
-        });
-        document.getElementById('theme-switch').textContent = '☀️';
-        darkorlight = false;
-    }
-    
-    const easyList = document.getElementById('easy');
-    const notdoList = document.getElementById('notdo');
-    const changePageButton = document.getElementById('changePage');
-
-    // 判斷當前顯示的是哪個列表
-    if (easyList.style.display === 'block') {
-        // 更改按鈕文字為 "前往簡單排序"
-        changePageButton.innerText = "前往 想不想做 排序";
-    } else {
-        // 更改按鈕文字為 "前往困難排序"
-        changePageButton.innerText = "前往 簡單困難 排序";
-    }
-}
-
-// 點擊事件處理器，處理隱藏 modal 的邏輯
-document.addEventListener('click', function(event) {
-    const modal = document.getElementById('result-modal');
-    const target = event.target;
-    // 檢查 modal 是否顯示中，並且點擊的不是 modal 內部的元素
-    if (event.target == modal) {
-        modal.style.display = "none";
-    }
-});
-
-// 監聽螢幕大小改變，當改變時重新調整版面
-window.addEventListener('resize', adjustLayout);
-
-
-function showNotification(message, duration = 3000, backgroundColor = null) {
-    const notification = document.getElementById('notification');
-    const messageElement = document.getElementById('notification-message');
-    
-    // 清除之前的定時器
-    clearTimeout(notification.timer);
-    
-    // 設定訊息內容
-    messageElement.textContent = message;
-    
-    // 設定背景顏色，如果有指定
-    if (backgroundColor) {
-        notification.style.backgroundColor = backgroundColor;
-    } else {
-        // 如果未指定背景色，則使用默認樣式
-        notification.style.backgroundColor = ''; 
-    }
-    
-    // 顯示通知
-    notification.classList.add('show');
-    notification.style.opacity = '1'; // 確保 opacity 為 1
-    
-    // 設定定時器在指定時間後隱藏通知
-    notification.timer = setTimeout(() => {
-        notification.style.opacity = '0';   // 觸發淡出效果
-        
-        // 設定一個定時器在淡出效果完成後隱藏 notification
-        setTimeout(() => {
-            notification.classList.remove('show');  // 隱藏通知
-        }, 500);  // 與淡出動畫時間一致
-    }, duration);
-}
+//});
 
 
 
@@ -259,7 +254,7 @@ function showLists_once() {
         showNotification('自動載入上次排序！', 1500);
         
     } catch(e){
-        console.log('load error',e);
+//        console.log('load error',e);
         return;
     }
 }
@@ -285,9 +280,30 @@ function clearAll() {
 
 function fillRandomAdventures() {
     const randomAdventures = [
-        '登山探險', '潛水活動', '滑雪挑戰', '極限飛行', '沙漠徒步', '高空彈跳', '跳傘', '深海潛水',
-        '滑翔翼', '冰川健行', '荒野求生', '叢林探險', '騎行旅行', '漂流', '海島探險', '火山探險',
-        '北極圈探險', '洞穴探險', '熱氣球旅行', '越野賽車'
+        // 戶外冒險類
+        '登山探險', '潛水活動', '滑雪挑戰', '極限飛行', '高空彈跳', '跳傘', '深海潛水',
+        '滑翔翼', '冰川健行', '荒野求生', '叢林探險', '漂流', '海島探險', '火山探險',
+        '北極圈探險', '熱氣球旅行', '越野賽車',
+
+        // 創意靜態類
+        '讀書', '下棋', '瑜伽', '靜坐冥想', '觀賞電影', '繪畫', '手工藝', '烘焙', '園藝', 
+        '散步', '寫作', '聽音樂', '攝影',
+
+        // 運動健身類
+        '健身房鍛鍊', '跑步', '游泳', '自行車旅行', '籃球比賽', '足球練習', '羽毛球比賽',
+        '攀岩', '跆拳道', '馬拉松訓練', '皮划艇', '高爾夫',
+
+        // 社交活動類
+        '聚會', '野餐', '燒烤', '桌遊之夜', '參加音樂會', '參加講座', '公益活動', '博物館參觀',
+
+        // 團隊挑戰類
+        '密室逃脫', '團隊攀岩', '團隊野外生存', '團隊賽跑接力', '團隊帆船比賽', '團隊遊戲挑戰',
+
+        // 文化與藝術類
+        '參觀美術館', '參加劇場表演', '參加書法課程', '雕塑製作', '陶藝體驗', '文學討論會',
+
+        // 探索與學習類
+        '天文觀測', '野外植物識別', '考古探索', '歷史遺跡巡禮', '科技博覽會', '科學實驗'
     ];
 
     // 將冒險事項隨機排列
@@ -510,6 +526,23 @@ function drop(e) {
     updateIndices();  // 更新序號
 }
 
+function postResultsToGoogleAppScript(topResults) {
+    const url = 'https://script.google.com/macros/s/AKfycbzKJI_ML7HGZaGi63b032nWqCNFwXl9hWavaGzbZUCJjR_7H0B1cz8hiS0-8MPfXWD9-w/exec'; // 替換成你的 Google App Script 網址
+
+    const data = {
+        topResults: topResults
+    };
+//    console.log(data);
+    
+    // 使用 jQuery 的 post 方法發送 POST 請求
+    $.post( url, JSON.stringify(data), function(result) {
+//        console.log('POST 成功:', result);
+    }).fail(function(error) {
+//        console.error('POST 失敗:', error);
+        return;
+    });
+}
+
 // ... (rest of the code remains unchanged)
 function getDragAfterElement(container, y) {
     const draggableElements = [...container.querySelectorAll('.list-item:not(.dragging)')];
@@ -543,7 +576,7 @@ function calculateResult() {
         const confirmation = confirm("尚未排序另一個項目，是否確定完成?");
         if (confirmation) {
             // 用戶選擇確定，執行計算結果
-            console.log("Calculating results...");
+//            console.log("Calculating results...");
             // 在此處添加計算結果的邏輯
         } else {
             // 用戶選擇取消，跳轉到 changePage()
@@ -577,6 +610,8 @@ function calculateResult() {
         return {
             item: diff,
             score: diffScore * desireScore,  // 使用分數相乘
+            diffScore,                       // 紀錄難度分數
+            desireScore,                     // 紀錄欲望分數
             difficultyIndex: index           // 紀錄項目在原始 difficultyOrder 的順序
         };
     });
@@ -589,7 +624,15 @@ function calculateResult() {
         return b.score - a.score;  // 主要依據分數由高到低排序
     });
 
+    // 輸出項目、幾分*幾分、排名
+//    scores.forEach((item, index) => {
+//        console.log(`${item.item}, ${item.diffScore} * ${item.desireScore}, 排名: ${index + 1}`);
+//    });
+    
     const topN = totalItems < 13 ? 3 : 5;  // 根據項目數量決定產生幾個
+    const topResults = scores.slice(0, topN).map((result, i) => `${result.item}`);
+
+    
     let result = '<ul>';
 
     for (let i = 0; i < topN; i++) {
@@ -615,6 +658,22 @@ function calculateResult() {
         console.log('save list error:', e);
         return;
     }
+    
+    // 獲取當前日期
+    const currentDate = new Date();
+    
+    // 取得當前的月份和日期
+    const month = currentDate.getMonth() + 1; // 獲取月份（1-12）
+    const date = currentDate.getDate(); // 獲取日期（1-31）
+
+    // 檢查是否在 10 月 6 日到 10 月 30 日之間
+    if (month === 10 && date >= 6 && date <= 15) {
+        // 在指定範圍內，呼叫 postResultsToGoogleAppScript
+        postResultsToGoogleAppScript(topResults);
+    } else {
+//        console.log("今天的日期不在 10/6 到 10/30 之間，因此不呼叫函數。");
+    }
+    
 }
 
 
