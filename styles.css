@@ -213,7 +213,7 @@ h2, h3 {
 
 .modal-content {
     background-color: white;
-    margin: 3% auto;
+    margin: 10% auto;
     padding: 20px;
     border-radius: 5px;
     min-width: 50px;
@@ -273,7 +273,7 @@ h2, h3 {
     padding: 10px 20px;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
+    z-index: 1001;
     opacity: 0;
     transition: opacity 0.5s ease-in-out;
 }
@@ -423,8 +423,9 @@ body.dark-mode h2{
     }
     
     .modal-content {
+        width: 80%;
         margin: 35% auto;
-        font-size: 1rem;
+        font-size: 1.5rem;
     }
     
     #result {

@@ -208,6 +208,13 @@ function showLists_once() {
     const savedDesireOrder = JSON.parse(localStorage.getItem('desireOrder'));
 
     try {
+        const totalItems = savedDifficultyOrder.length; // 獲取 list 的長度
+        const tailNumber = totalItems >= 20 ? 20 : totalItems; // 如果項目少於 20，則設置為當前項目數量
+
+        // 動態修改提示文本
+        document.querySelector('.list-description.easy p').setAttribute('data-message', `(1最簡單，${tailNumber}最困難)`);
+        document.querySelector('.list-description.notdo p').setAttribute('data-message', `(1最想做，${tailNumber}最不想做)`);
+
         savedDifficultyOrder.forEach((adventure, index) => {
             const difficultyItem = `<div class="list-item ${darkorlight ? '' : 'dark-mode'}" draggable="true" data-index="${index + 1}" id="diff-${index}">
                 <div class="index">${index + 1}. </div>
@@ -344,6 +351,14 @@ function showLists() {
     const difficultyList = document.getElementById('difficulty-list');
     const desireList = document.getElementById('desire-list');
 
+    
+    const totalItems = adventures.length; // 獲取 list 的長度
+    const tailNumber = totalItems >= 20 ? 20 : totalItems; // 如果項目少於 20，則設置為當前項目數量
+
+    // 動態修改提示文本
+    document.querySelector('.list-description.easy p').setAttribute('data-message', `(1最簡單，${tailNumber}最困難)`);
+    document.querySelector('.list-description.notdo p').setAttribute('data-message', `(1最想做，${tailNumber}最不想做)`);
+    
     difficultyList.innerHTML = '<h3>簡單到困難</h3>';
     desireList.innerHTML = '<h3>想做到不想做</h3>';
 
@@ -524,7 +539,7 @@ function updateIndices() {
 }
 
 function calculateResult() {
-    if (!isChangePageCalled) {
+    if (!isChangePageCalled && window.matchMedia("(max-width: 768px)").matches) {
         const confirmation = confirm("尚未排序另一個項目，是否確定完成?");
         if (confirmation) {
             // 用戶選擇確定，執行計算結果
@@ -712,3 +727,26 @@ function changePage() {
         behavior: 'smooth'
     });
 }
+
+function copyToClipboard() {
+    // 獲取 #result 內的所有文字
+    const resultText = document.getElementById('result').innerText;
+    
+    // 將文字以換行符號分割為陣列，並去掉每個項目前的序號
+    const resultArray = resultText.split('\n').map(item => item.replace(/^\s*\d+名：\s*/, ''));
+    
+    // 用", "將陣列中的項目連接成一行
+    const formattedText = resultArray.join('、');
+    
+    // 創建一個不可見的 textarea 來臨時存放格式化後的文字
+    const textarea = document.createElement('textarea');
+    textarea.value = formattedText;
+    document.body.appendChild(textarea); // 將 textarea 暫時加入到 body
+    textarea.select(); // 選取 textarea 內的文字
+    document.execCommand('copy'); // 執行複製命令
+    document.body.removeChild(textarea); // 移除 textarea
+
+    // 顯示通知給使用者
+    showNotification('文字已複製到剪貼簿', 900 );
+}
+
