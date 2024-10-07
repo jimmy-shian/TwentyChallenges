@@ -185,6 +185,7 @@ h2, h3 {
 }
  
     #result {
+        position: relative;
         text-align: center;
     }
     #result ul {
@@ -487,4 +488,27 @@ body.dark-mode h2{
     .list-item {
         padding: 10px;
     }
+}
+
+/* 覆蓋層樣式，初始時不可見 */
+.overlay {
+    position: absolute;
+    top: -30px;
+    left: -20px;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    color: white;
+    display: flex;
+    text-align: center;
+    padding: 20px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 當鼠標 hover 到 result 時顯示覆蓋層 */
+#result:hover .overlay {
+    opacity: 1;
 }

@@ -640,6 +640,9 @@ function calculateResult() {
     }
 
     result += '</ul>';
+    result +=`     <div class="overlay">
+                <p>“All our dreams can come true, if we have the courage to pursue them."<br>「只要我們有勇氣去追求夢想,每一個夢也能實現。」<br>——華特·迪士尼(Walt Disney)</p>
+            </div>`
 
     document.getElementById('result').innerHTML = result;
     document.getElementById('result-modal').style.display = 'block';
@@ -786,6 +789,7 @@ function changePage() {
         behavior: 'smooth'
     });
 }
+
 
 function copyToClipboard() {
     // 獲取 #result 內的所有文字
