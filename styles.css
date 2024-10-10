@@ -185,9 +185,13 @@ h2, h3 {
 }
  
     #result {
+        display: flex;
         position: relative;
-        text-align: center;
+        text-align: justify;
+        justify-content: center;
+        margin-bottom: 20px;
     }
+
     #result ul {
         list-style-type: none; /* 隱藏預設的圓點 */
         padding-left: 0; /* 清除內邊距 */
@@ -218,7 +222,7 @@ h2, h3 {
     padding: 20px;
     border-radius: 5px;
     min-width: 50px;
-    width: 50%;
+    width: 70%;
     text-align: center;
     box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.2);
     font-size: 1.2rem;
@@ -432,6 +436,16 @@ body.dark-mode h2{
     #result {
         text-align: left;
     }
+    
+    .list-contain {
+        width: 70%;
+        margin: 0 20% 0 10%;
+        min-height: 400px;
+        position: relative;
+    }
+    .list-item {
+        padding: 10px;
+    }
 }
 
 
@@ -476,20 +490,6 @@ body.dark-mode h2{
 }
 
 
-/* 當進入手機模式（寬度小於 768px）時顯示按鈕 */
-@media (max-width: 768px) {
-    
-    .list-contain {
-        width: 70%;
-        margin: 0 20% 0 10%;
-        min-height: 400px;
-        position: relative;
-    }
-    .list-item {
-        padding: 10px;
-    }
-}
-
 /* 覆蓋層樣式，初始時不可見 */
 .overlay {
     position: absolute;
@@ -506,9 +506,11 @@ body.dark-mode h2{
     transition: opacity 0.5s ease-in-out;
     align-items: center;
     justify-content: center;
+    text-wrap: balance;
 }
 
 /* 當鼠標 hover 到 result 時顯示覆蓋層 */
 #result:hover .overlay {
     opacity: 1;
 }
+

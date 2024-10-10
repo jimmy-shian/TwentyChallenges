@@ -58,6 +58,21 @@
     }
 
     $(window).scroll(function() {
+        
+        function checkWindowSize() {
+            var windowWidth = $(window).width();
+            var overlay = $(".overlay");
+
+            if (windowWidth <= 716) {
+                overlay.css('display', 'none'); // 小於912px，隱藏
+            } else {
+                overlay.css('display', 'flex'); // 大於912px，顯示（或保持正常狀態）
+            }
+        }
+
+        // 當頁面載入時檢查一次
+        checkWindowSize();
+        
         var btn = $("#scrollBtn");
         var scrollPosition = $(document).scrollTop();
         var windowHeight = $(document).height();
@@ -641,7 +656,7 @@ function calculateResult() {
 
     result += '</ul>';
     result +=`     <div class="overlay">
-                <p>“All our dreams can come true, if we have the courage to pursue them."<br>「只要我們有勇氣去追求夢想,每一個夢也能實現。」<br>——華特·迪士尼(Walt Disney)</p>
+                <p>“All our dreams can come true, if we have the courage to pursue them."<br><br>「只要我們有勇氣去追求夢想,每一個夢也能實現。」<br><br>——華特·迪士尼(Walt Disney)</p>
             </div>`
 
     document.getElementById('result').innerHTML = result;
@@ -792,15 +807,15 @@ function changePage() {
 
 
 function copyToClipboard() {
-    // 獲取 #result 內的所有文字
-    const resultText = document.getElementById('result').innerText;
+    // 獲取 #result 內的 ul 元素
+    const ulElement = document.querySelector('#result ul');
     
-    // 將文字以換行符號分割為陣列，並去掉每個項目前的序號
-    const resultArray = resultText.split('\n').map(item => item.replace(/^\s*\d+名：\s*/, ''));
-    
-    // 用", "將陣列中的項目連接成一行
-    const formattedText = resultArray.join('、');
-    
+    // 獲取 ul 內的所有 li 元素的文字
+    const resultArray = Array.from(ulElement.querySelectorAll('li')).map(item => item.innerText.replace(/^\s*\d+名：\s*/, ''));
+
+    // 用 "、" 將陣列中的項目連接成一行
+    const formattedText = resultArray.join(',\n');
+
     // 創建一個不可見的 textarea 來臨時存放格式化後的文字
     const textarea = document.createElement('textarea');
     textarea.value = formattedText;
